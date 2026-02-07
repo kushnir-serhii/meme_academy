@@ -49,7 +49,7 @@ export default function JudgingScreen() {
         <div className="flex items-center justify-center gap-2">
           {judge && (
             <>
-              <PlayerAvatar player={judge} size="sm" />
+              <PlayerAvatar player={judge} size="lg" />
               <span className="text-game-text-dim">
                 {isJudge ? t('pickWinningMeme') : t('judgePicking', { nickname: judge.nickname })}
               </span>

@@ -31,7 +31,9 @@
     "nicknamePlaceholder": "Enter nickname...",
     "nicknameHint": "2-20 characters",
     "creating": "Creating...",
-    "createRoom": "Create Room"
+    "createRoom": "Create Room",
+    "errorNicknameHint": "Try a different nickname",
+    "errorAvatarHint": "Try changing your background color or picking a different avatar"
   },
   "join": {
     "title": "Join Game",
@@ -42,7 +44,9 @@
     "nicknamePlaceholder": "Enter nickname...",
     "nicknameHint": "2-20 characters",
     "joining": "Joining...",
-    "joinRoom": "Join Room"
+    "joinRoom": "Join Room",
+    "errorNicknameHint": "Try a different nickname",
+    "errorAvatarHint": "Try changing your background color or picking a different avatar"
   },
   "lobby": {
     "shareCode": "Share this code with friends",

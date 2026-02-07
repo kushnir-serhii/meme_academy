@@ -31,7 +31,9 @@
     "nicknamePlaceholder": "Введіть нікнейм...",
     "nicknameHint": "2-20 символів",
     "creating": "Створюємо...",
-    "createRoom": "Створити кімнату"
+    "createRoom": "Створити кімнату",
+    "errorNicknameHint": "Спробуйте інший нікнейм",
+    "errorAvatarHint": "Спробуйте змінити колір фону або обрати інший аватар"
   },
   "join": {
     "title": "Приєднатися",
@@ -42,7 +44,9 @@
     "nicknamePlaceholder": "Введіть нікнейм...",
     "nicknameHint": "2-20 символів",
     "joining": "Приєднуємося...",
-    "joinRoom": "Приєднатися"
+    "joinRoom": "Приєднатися",
+    "errorNicknameHint": "Спробуйте інший нікнейм",
+    "errorAvatarHint": "Спробуйте змінити колір фону або обрати інший аватар"
   },
   "lobby": {
     "shareCode": "Поділіться цим кодом з друзями",

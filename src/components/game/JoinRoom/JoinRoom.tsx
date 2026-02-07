@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { Link, useRouter } from '@/i18n/navigation';
 import { useGameSocket, useGameStore } from '@/lib/game';
 import { useTranslations } from 'next-intl';
+import { AvatarPicker } from '@/components/game/common';
 
 export const JoinRoom = () => {
   const t = useTranslations('join');
@@ -14,9 +15,12 @@ export const JoinRoom = () => {
 
   const [roomCode, setRoomCode] = useState(initialCode);
   const [nickname, setNickname] = useState('');
+  const [avatarId, setAvatarId] = useState<number | null>(null);
+  const [bgColor, setBgColor] = useState<string | null>(null);
   const router = useRouter();
   const { connect, joinRoom, connectionStatus } = useGameSocket();
   const { isLoading, error, playerId, gameState } = useGameStore();
+  const setError = useGameStore((s) => s.setError);
 
   useEffect(() => {
     connect();
@@ -31,7 +35,7 @@ export const JoinRoom = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isValid && connectionStatus === 'connected') {
-      joinRoom(roomCode.trim(), nickname.trim());
+      joinRoom(roomCode.trim(), nickname.trim(), avatarId, bgColor);
     }
   };
 
@@ -39,6 +43,7 @@ export const JoinRoom = () => {
     const value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
     if (value.length <= 6) {
       setRoomCode(value);
+      if (error) setError(null);
     }
   };
 
@@ -89,7 +94,10 @@ export const JoinRoom = () => {
               id="nickname"
               type="text"
               value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
+              onChange={(e) => {
+                setNickname(e.target.value);
+                if (error) setError(null);
+              }}
               placeholder={t('nicknamePlaceholder')}
               className="game-input"
               maxLength={20}
@@ -98,7 +106,32 @@ export const JoinRoom = () => {
             <p className="text-game-text-dim mt-2 text-xs">{t('nicknameHint')}</p>
           </div>
 
-          {error && <div className="text-game-error text-center text-sm">{error}</div>}
+          <AvatarPicker
+            nickname={nickname}
+            selectedAvatarId={avatarId}
+            selectedBgColor={bgColor}
+            onAvatarChange={(id) => {
+              setAvatarId(id);
+              if (error) setError(null);
+            }}
+            onBgColorChange={(color) => {
+              setBgColor(color);
+              if (error) setError(null);
+            }}
+          />
+
+          {error && (
+            <div className="space-y-1 text-center text-sm">
+              <p className="text-game-error">{error}</p>
+              {error.toLowerCase().includes('nickname') && (
+                <p className="text-game-text-dim text-xs">{t('errorNicknameHint')}</p>
+              )}
+              {(error.toLowerCase().includes('avatar') ||
+                error.toLowerCase().includes('combo')) && (
+                <p className="text-game-text-dim text-xs">{t('errorAvatarHint')}</p>
+              )}
+            </div>
+          )}
 
           {connectionStatus !== 'connected' && (
             <div className="flex items-center justify-center gap-2 text-center text-sm text-yellow-400">

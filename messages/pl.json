@@ -31,7 +31,9 @@
     "nicknamePlaceholder": "Wpisz nick...",
     "nicknameHint": "2-20 znaków",
     "creating": "Tworzenie...",
-    "createRoom": "Stwórz pokój"
+    "createRoom": "Stwórz pokój",
+    "errorNicknameHint": "Spróbuj inny nick",
+    "errorAvatarHint": "Spróbuj zmienić kolor tła lub wybrać innego awatara"
   },
   "join": {
     "title": "Dołącz do gry",
@@ -42,7 +44,9 @@
     "nicknamePlaceholder": "Wpisz nick...",
     "nicknameHint": "2-20 znaków",
     "joining": "Dołączanie...",
-    "joinRoom": "Dołącz do pokoju"
+    "joinRoom": "Dołącz do pokoju",
+    "errorNicknameHint": "Spróbuj inny nick",
+    "errorAvatarHint": "Spróbuj zmienić kolor tła lub wybrać innego awatara"
   },
   "lobby": {
     "shareCode": "Udostępnij ten kod znajomym",

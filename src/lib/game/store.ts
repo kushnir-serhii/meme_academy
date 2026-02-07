@@ -15,12 +15,25 @@ interface GameStore extends ClientState {
   selectMeme: (memeId: string | null) => void;
   setSubmitted: (submitted: boolean) => void;
 
+  // Avatar
+  setMyAvatar: (avatarId: number | null, bgColor: string | null) => void;
+
   // UI
   setError: (error: string | null) => void;
   setLoading: (loading: boolean) => void;
 
   // Reset
   reset: () => void;
+}
+
+function loadAvatarFromSession(): { myAvatarId: number | null; myAvatarBgColor: string | null } {
+  if (typeof window === 'undefined') return { myAvatarId: null, myAvatarBgColor: null };
+  const avatarId = sessionStorage.getItem('myAvatarId');
+  const bgColor = sessionStorage.getItem('myAvatarBgColor');
+  return {
+    myAvatarId: avatarId ? Number(avatarId) : null,
+    myAvatarBgColor: bgColor || null,
+  };
 }
 
 const initialState: ClientState = {
@@ -33,6 +46,7 @@ const initialState: ClientState = {
   hasSubmitted: false,
   error: null,
   isLoading: false,
+  ...loadAvatarFromSession(),
 };
 
 export const useGameStore = create<GameStore>()((set) => ({
@@ -47,6 +61,22 @@ export const useGameStore = create<GameStore>()((set) => ({
   setHand: (myHand) => set({ myHand }),
   selectMeme: (selectedMemeId) => set({ selectedMemeId }),
   setSubmitted: (hasSubmitted) => set({ hasSubmitted }),
+
+  setMyAvatar: (myAvatarId, myAvatarBgColor) => {
+    if (typeof window !== 'undefined') {
+      if (myAvatarId !== null) {
+        sessionStorage.setItem('myAvatarId', String(myAvatarId));
+      } else {
+        sessionStorage.removeItem('myAvatarId');
+      }
+      if (myAvatarBgColor !== null) {
+        sessionStorage.setItem('myAvatarBgColor', myAvatarBgColor);
+      } else {
+        sessionStorage.removeItem('myAvatarBgColor');
+      }
+    }
+    set({ myAvatarId, myAvatarBgColor });
+  },
 
   setError: (error) => set({ error }),
   setLoading: (isLoading) => set({ isLoading }),

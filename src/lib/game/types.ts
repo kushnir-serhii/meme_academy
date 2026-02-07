@@ -8,6 +8,7 @@ export interface Player {
   id: PlayerId;
   nickname: string;
   avatarColor: string;
+  avatarId: number | null;
   score: number;
   isConnected: boolean;
   isHost: boolean;
@@ -64,6 +65,8 @@ export interface ClientState {
   hasSubmitted: boolean;
   error: string | null;
   isLoading: boolean;
+  myAvatarId: number | null;
+  myAvatarBgColor: string | null;
 }
 
 // ============ SOCKET MESSAGE TYPES ============

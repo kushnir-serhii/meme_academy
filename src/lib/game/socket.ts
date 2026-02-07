@@ -54,21 +54,23 @@ export function useGameSocket() {
   }, [store]);
 
   const createRoom = useCallback(
-    (nickname: string) => {
+    (nickname: string, avatarId?: number | null, bgColor?: string | null) => {
       const s = getSocket();
       const locale = getCurrentLocale();
       store.setLoading(true);
-      s.emit('create_room', { nickname, locale });
+      store.setMyAvatar(avatarId ?? null, bgColor ?? null);
+      s.emit('create_room', { nickname, locale, avatarId, bgColor });
     },
     [store],
   );
 
   const joinRoom = useCallback(
-    (roomCode: string, nickname: string) => {
+    (roomCode: string, nickname: string, avatarId?: number | null, bgColor?: string | null) => {
       const s = getSocket();
       const locale = getCurrentLocale();
       store.setLoading(true);
-      s.emit('join_room', { roomCode: roomCode.toUpperCase(), nickname, locale });
+      store.setMyAvatar(avatarId ?? null, bgColor ?? null);
+      s.emit('join_room', { roomCode: roomCode.toUpperCase(), nickname, locale, avatarId, bgColor });
     },
     [store],
   );
