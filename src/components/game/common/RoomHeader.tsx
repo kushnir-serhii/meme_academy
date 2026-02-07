@@ -2,6 +2,7 @@
 
 import { useGameStore, selectPlayers, selectMyPlayer } from '@/lib/game';
 import { useTranslations } from 'next-intl';
+import PlayerAvatar from './PlayerAvatar';
 
 interface RoomHeaderProps {
   compact?: boolean;
@@ -44,13 +45,7 @@ export default function RoomHeader({ compact = false }: RoomHeaderProps) {
         {/* Current user avatar */}
         {myPlayer && (
           <div className="flex items-center gap-2">
-            <div
-              className="player-avatar player-avatar-sm"
-              style={{ backgroundColor: myPlayer.avatarColor }}
-              title={myPlayer.nickname}
-            >
-              {myPlayer.nickname.charAt(0).toUpperCase()}
-            </div>
+            <PlayerAvatar player={myPlayer} size="sm" />
             <span className="hidden text-xs font-medium sm:inline sm:text-sm">
               {myPlayer.nickname}
             </span>

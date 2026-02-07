@@ -6,14 +6,18 @@ import { useRouter } from '@/i18n/navigation';
 import { Link } from '@/i18n/navigation';
 import { useGameSocket, useGameStore } from '@/lib/game';
 import { useTranslations } from 'next-intl';
+import { AvatarPicker } from '@/components/game/common';
 
 export default function CreateRoomPage() {
   const t = useTranslations('create');
   const tCommon = useTranslations('common');
   const [nickname, setNickname] = useState('');
+  const [avatarId, setAvatarId] = useState<number | null>(null);
+  const [bgColor, setBgColor] = useState<string | null>(null);
   const router = useRouter();
   const { connect, createRoom, connectionStatus } = useGameSocket();
   const { isLoading, error, roomCode } = useGameStore();
+  const setError = useGameStore((s) => s.setError);
 
   useEffect(() => {
     connect();
@@ -28,7 +32,7 @@ export default function CreateRoomPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (nickname.trim().length >= 2 && connectionStatus === 'connected') {
-      createRoom(nickname.trim());
+      createRoom(nickname.trim(), avatarId, bgColor);
     }
   };
 
@@ -63,7 +67,10 @@ export default function CreateRoomPage() {
               id="nickname"
               type="text"
               value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
+              onChange={(e) => {
+                setNickname(e.target.value);
+                if (error) setError(null);
+              }}
               placeholder={t('nicknamePlaceholder')}
               className="game-input"
               maxLength={20}
@@ -73,7 +80,32 @@ export default function CreateRoomPage() {
             <p className="text-game-text-dim mt-2 text-xs">{t('nicknameHint')}</p>
           </div>
 
-          {error && <div className="text-game-error text-center text-sm">{error}</div>}
+          <AvatarPicker
+            nickname={nickname}
+            selectedAvatarId={avatarId}
+            selectedBgColor={bgColor}
+            onAvatarChange={(id) => {
+              setAvatarId(id);
+              if (error) setError(null);
+            }}
+            onBgColorChange={(color) => {
+              setBgColor(color);
+              if (error) setError(null);
+            }}
+          />
+
+          {error && (
+            <div className="space-y-1 text-center text-sm">
+              <p className="text-game-error">{error}</p>
+              {error.toLowerCase().includes('nickname') && (
+                <p className="text-game-text-dim text-xs">{t('errorNicknameHint')}</p>
+              )}
+              {(error.toLowerCase().includes('avatar') ||
+                error.toLowerCase().includes('combo')) && (
+                <p className="text-game-text-dim text-xs">{t('errorAvatarHint')}</p>
+              )}
+            </div>
+          )}
 
           {connectionStatus !== 'connected' && (
             <div className="flex items-center justify-center gap-2 text-center text-sm text-yellow-400">
