@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { ClientState, GameState, MemeCard, PlayerId } from './types';
+import { ClientState, FinalGameState, GameState, MemeCard, PlayerId } from './types';
 
 interface GameStore extends ClientState {
   // Connection actions
@@ -21,6 +21,10 @@ interface GameStore extends ClientState {
   // UI
   setError: (error: string | null) => void;
   setLoading: (loading: boolean) => void;
+
+  // Finish game
+  setFinalGameState: (data: FinalGameState | null) => void;
+  setShouldNavigateToFinished: (value: boolean) => void;
 
   // Reset
   reset: () => void;
@@ -46,6 +50,8 @@ const initialState: ClientState = {
   hasSubmitted: false,
   error: null,
   isLoading: false,
+  finalGameState: null,
+  shouldNavigateToFinished: false,
   ...loadAvatarFromSession(),
 };
 
@@ -80,6 +86,9 @@ export const useGameStore = create<GameStore>()((set) => ({
 
   setError: (error) => set({ error }),
   setLoading: (isLoading) => set({ isLoading }),
+
+  setFinalGameState: (finalGameState) => set({ finalGameState }),
+  setShouldNavigateToFinished: (shouldNavigateToFinished) => set({ shouldNavigateToFinished }),
 
   reset: () => set(initialState),
 }));

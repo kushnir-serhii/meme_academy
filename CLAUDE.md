@@ -44,37 +44,44 @@ lobby → phrase_selection → picking → judging → result → phrase_selecti
 | `judging` | Judge sees all submitted memes, picks winner |
 | `result` | Shows winner, scoreboard. **Winner** clicks "Next Round" |
 
-**Important**: Winner becomes the next judge and sees the phrase selection screen.
+**Important**:
+- **First judge is always the host**
+- Winner becomes the next judge and sees the phrase selection screen
+- `picking → judging` transition is automatic (server-side) when all non-judges submit
 
 ## Socket Events
 
 ### Client → Server
 | Event | Payload | Description |
 |-------|---------|-------------|
-| `create_room` | `{ nickname }` | Create new room |
-| `join_room` | `{ roomCode, nickname }` | Join existing room |
-| `reconnect_room` | `{ playerId, roomCode }` | Reconnect after disconnect |
+| `create_room` | `{ nickname, locale?, avatarId?, bgColor? }` | Create new room |
+| `join_room` | `{ roomCode, nickname, locale?, avatarId?, bgColor? }` | Join existing room |
+| `reconnect_room` | `{ playerId, roomCode, locale? }` | Reconnect after disconnect |
+| `change_locale` | `{ locale }` | Update player's locale mid-game |
 | `start_game` | - | Host starts game |
 | `select_phrase` | `{ phraseId }` | Judge selects phrase for round |
 | `submit_meme` | `{ memeId }` | Player submits meme |
-| `select_winner` | `{ oderId }` | Judge picks winning meme |
+| `select_winner` | `{ oderId }` | Judge picks winning meme (`oderId` format: `"order-0"`, `"order-1"`, ...) |
 | `next_round` | - | Winner triggers next round |
+| `finish_game` | - | Host ends the game |
 
 ### Server → Client
 | Event | Payload | Description |
 |-------|---------|-------------|
 | `room_created` | `{ roomCode, playerId }` | Room creation success |
-| `room_joined` | `{ playerId }` | Join success |
-| `room_state` | `{ state: GameState }` | Full game state sync |
-| `hand_dealt` | `{ hand: MemeCard[] }` | Player's meme cards |
-| `player_joined` | `{ player }` | New player joined |
-| `player_left` | `{ playerId }` | Player disconnected |
-| `player_reconnected` | `{ playerId }` | Player reconnected |
-| `phrase_selected` | `{ phrase }` | Judge selected phrase |
-| `player_submitted` | `{ playerId }` | A player submitted meme |
-| `winner_selected` | `{ winnerId, oderId }` | Judge picked winner |
-| `new_round` | `{ round }` | New round started |
-| `error` | `{ message }` | Error message |
+| `room_joined` | `{ playerId }` | Join/reconnect success (sent to joining socket only) |
+| `room_state` | `{ state: GameState }` | Full game state sync (broadcast after every state change) |
+| `hand_dealt` | `{ hand: MemeCard[] }` | Player's meme cards (individual, not broadcast) |
+| `player_joined` | `{ player }` | New player joined (broadcast) |
+| `player_left` | `{ playerId }` | Player disconnected (broadcast) |
+| `player_reconnected` | `{ playerId }` | Player reconnected (broadcast) |
+| `phrase_selected` | `{ phrase }` | Judge selected phrase (broadcast) |
+| `player_submitted` | `{ playerId }` | A player submitted meme (broadcast) |
+| `winner_selected` | `{ winnerId, oderId }` | Judge picked winner (broadcast) |
+| `new_round` | `{ round }` | New round started (broadcast) |
+| `game_finished` | - | Host ended game — all clients redirect to `/finished` |
+| `locale_changed` | `{ locale }` | Locale update confirmed (sent to requesting socket only) |
+| `error` | `{ message }` | Translated error message (sent to requesting socket only) |
 
 ## Key Types
 
@@ -84,10 +91,12 @@ type GamePhase = 'lobby' | 'phrase_selection' | 'picking' | 'judging' | 'result'
 interface Player {
   id: PlayerId;
   nickname: string;
-  avatarColor: string;
+  avatarColor: string;     // Hex color — client's bgColor, or random if not provided
+  avatarId: number | null; // Avatar image index (1–8), or null for initial-letter avatar
   score: number;
   isConnected: boolean;
   isHost: boolean;
+  locale: 'en' | 'uk' | 'pl';
 }
 
 interface RoundState {

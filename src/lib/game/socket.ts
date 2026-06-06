@@ -40,18 +40,25 @@ export function useGameSocket() {
     if (isConnecting.current) return;
 
     const s = getSocket();
-    if (s.connected) return;
+    if (s.connected) {
+      store.setConnectionStatus('connected');
+      return;
+    }
 
     isConnecting.current = true;
     store.setConnectionStatus('connecting');
     s.connect();
   }, [store]);
-  // Need to implement finish game ===============================================================================
   const disconnect = useCallback(() => {
     const s = getSocket();
     s.disconnect();
     store.setConnectionStatus('disconnected');
   }, [store]);
+
+  const finishGame = useCallback(() => {
+    const s = getSocket();
+    s.emit('finish_game');
+  }, []);
 
   const createRoom = useCallback(
     (nickname: string, avatarId?: number | null, bgColor?: string | null) => {
@@ -193,6 +200,18 @@ export function useGameSocket() {
       }
     };
 
+    const handleGameFinished = () => {
+      const currentState = store.gameState;
+      store.setFinalGameState({
+        players: currentState?.players ?? [],
+        judgeId: currentState?.currentRound?.judgeId ?? null,
+      });
+      store.setShouldNavigateToFinished(true);
+      const s2 = getSocket();
+      s2.disconnect();
+      store.setConnectionStatus('disconnected');
+    };
+
     const handleError = ({ message }: { message: string }) => {
       store.setLoading(false);
       store.setError(message);
@@ -213,6 +232,7 @@ export function useGameSocket() {
     s.on('winner_selected', () => {}); // Handled by room_state
     s.on('new_round', () => {}); // Handled by room_state
     s.on('locale_changed', () => {}); // Acknowledged
+    s.on('game_finished', handleGameFinished);
     s.on('error', handleError);
 
     return () => {
@@ -230,6 +250,7 @@ export function useGameSocket() {
       s.off('winner_selected');
       s.off('new_round');
       s.off('locale_changed');
+      s.off('game_finished', handleGameFinished);
       s.off('error', handleError);
     };
   }, [store, reconnectToRoom]);
@@ -237,6 +258,7 @@ export function useGameSocket() {
   return {
     connect,
     disconnect,
+    finishGame,
     createRoom,
     joinRoom,
     reconnectToRoom,

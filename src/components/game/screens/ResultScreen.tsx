@@ -1,6 +1,6 @@
 'use client';
 
-import { useGameSocket, useGameStore, selectCurrentRound, selectPlayers, selectIsWinner } from '@/lib/game';
+import { useGameSocket, useGameStore, selectCurrentRound, selectPlayers, selectIsWinner, selectIsHost } from '@/lib/game';
 import { RoomHeader, PlayerAvatar } from '../common';
 import { PhraseCard } from '../cards';
 import { useTranslations } from 'next-intl';
@@ -8,11 +8,12 @@ import { useTranslations } from 'next-intl';
 export default function ResultScreen() {
   const t = useTranslations('result');
   const tCommon = useTranslations('common');
-  const { nextRound, disconnect } = useGameSocket();
+  const { nextRound, finishGame } = useGameSocket();
   const { playerId } = useGameStore();
   const round = useGameStore(selectCurrentRound);
   const players = useGameStore(selectPlayers);
   const isWinner = useGameStore(selectIsWinner);
+  const isHost = useGameStore(selectIsHost);
 
   if (!round) return null;
 
@@ -24,7 +25,7 @@ export default function ResultScreen() {
   const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
 
   return (
-    <div className="screen">
+    <div className="screen pb-6">
       <RoomHeader compact />
 
       <div className="screen-content gap-4 overflow-y-auto px-4">
@@ -109,14 +110,18 @@ export default function ResultScreen() {
         </div>
       </div>
 
-      {isWinner && (
-        <div className="flex flex-col gap-4">
-          <button onClick={nextRound} className="game-btn game-btn-primary w-full">
-            {t('nextRound')}
-          </button>
-          <button onClick={disconnect} className="game-btn game-btn-secondary w-full">
-            {t('finishGame')}
-          </button>
+      {(isWinner || isHost) && (
+        <div className="flex flex-col gap-4 px-4">
+          {isWinner && (
+            <button onClick={nextRound} className="game-btn game-btn-primary w-full">
+              {t('nextRound')}
+            </button>
+          )}
+          {isHost && (
+            <button onClick={finishGame} className="game-btn game-btn-secondary w-full">
+              {t('finishGame')}
+            </button>
+          )}
         </div>
       )}
     </div>

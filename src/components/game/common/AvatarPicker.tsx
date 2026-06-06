@@ -2,6 +2,7 @@
 
 import { useCallback } from 'react';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import { avatars, bgAvatarColors } from '@/data/avatarData';
 
 interface AvatarPickerProps {
@@ -19,6 +20,7 @@ export default function AvatarPicker({
   onAvatarChange,
   onBgColorChange,
 }: AvatarPickerProps) {
+  const t = useTranslations('avatarPicker');
   const initial = nickname.trim() ? nickname.trim().charAt(0).toUpperCase() : null;
 
   const handleWheel = useCallback((e: React.WheelEvent<HTMLDivElement>) => {
@@ -32,7 +34,7 @@ export default function AvatarPicker({
     <div className="space-y-4">
       {/* Avatar Selection */}
       <div>
-        <label className="mb-2 block text-sm font-medium">Avatar</label>
+        <label className="mb-2 block text-sm font-medium">{t('avatarLabel')}</label>
         <div className="avatar-scroll-slider" onWheel={handleWheel}>
           {/* No avatar option - show initial or user icon */}
           <button
@@ -83,7 +85,7 @@ export default function AvatarPicker({
 
       {/* Background Color Selection */}
       <div>
-        <label className="mb-2 block text-sm font-medium">Background</label>
+        <label className="mb-2 block text-sm font-medium">{t('bgColorLabel')}</label>
         <div className="color-scroll-slider" onWheel={handleWheel}>
           {/* Auto option */}
           <button

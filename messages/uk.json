@@ -107,9 +107,20 @@
     "nextRound": "Наступний раунд",
     "finishGame": "Завершити гру"
   },
+  "avatarPicker": {
+    "avatarLabel": "Аватар",
+    "bgColorLabel": "Фон аватара"
+  },
   "memeCard": {
     "imageUnavailable": "Зображення недоступне",
     "memeAlt": "Мем"
+  },
+  "finished": {
+    "gameOver": "Гра завершена!",
+    "winner": "Переможець",
+    "scoreboard": "Фінальна таблиця",
+    "createNewGame": "Створити нову гру",
+    "backToHome": "Перейти на головну"
   },
   "notFound": {
     "error": "ПОМИЛКА",

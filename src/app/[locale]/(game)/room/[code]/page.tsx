@@ -19,12 +19,19 @@ export default function RoomPage() {
   const roomCode = params.code as string;
 
   const { connect, connectionStatus } = useGameSocket();
-  const { gameState, playerId, error } = useGameStore();
+  const { gameState, playerId, error, shouldNavigateToFinished, setShouldNavigateToFinished } = useGameStore();
   const phase = useGameStore(selectCurrentPhase);
 
   useEffect(() => {
     connect();
   }, [connect]);
+
+  useEffect(() => {
+    if (shouldNavigateToFinished) {
+      setShouldNavigateToFinished(false);
+      router.push('/finished');
+    }
+  }, [shouldNavigateToFinished, setShouldNavigateToFinished, router]);
 
   useEffect(() => {
     // If no game state and not loading, redirect to join

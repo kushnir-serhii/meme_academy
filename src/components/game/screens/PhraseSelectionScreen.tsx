@@ -69,16 +69,14 @@ export default function PhraseSelectionScreen() {
         </div>
 
         {/* Judge indicator */}
-        <div className="flex items-center justify-center gap-2">
           {judge && (
-            <>
+        <div className="flex items-center justify-center gap-2">
               <PlayerAvatar player={judge} size="sm" />
-              <span className="text-game-text-dim">
+              <h2 className="text-2xl text-white mt-1">
                 {isJudge ? t('choosePhrase') : t('judgeChoosing', { nickname: judge.nickname })}
-              </span>
-            </>
-          )}
+              </h2>
         </div>
+          )}
 
         {isJudge ? (
           <div className="relative flex flex-1 flex-col items-center justify-center gap-6">
