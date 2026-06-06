@@ -37,10 +37,10 @@ export interface Submission {
 export interface RoundState {
   roundNumber: number;
   judgeId: PlayerId;
-  phraseOptions: Phrase[];
-  phrase: Phrase | null;
+  phraseOptions: Phrase[];        // 3 options visible during phrase_selection
+  phrase: Phrase | null;          // null until judge selects
   submittedPlayerIds: PlayerId[];
-  revealedSubmissions: Submission[];
+  revealedSubmissions: Submission[]; // only populated during judging/result
   winnerId: PlayerId | null;
   winningMemeId: string | null;
 }
@@ -55,6 +55,11 @@ export interface GameState {
 
 // ============ CLIENT STATE ============
 
+export interface FinalGameState {
+  players: Player[];
+  judgeId: PlayerId | null;
+}
+
 export interface ClientState {
   playerId: PlayerId | null;
   roomCode: RoomCode | null;
@@ -67,20 +72,24 @@ export interface ClientState {
   isLoading: boolean;
   myAvatarId: number | null;
   myAvatarBgColor: string | null;
+  finalGameState: FinalGameState | null;
+  shouldNavigateToFinished: boolean;
 }
 
 // ============ SOCKET MESSAGE TYPES ============
 
 // Client -> Server
 export type ClientMessage =
-  | { type: 'create_room'; nickname: string }
-  | { type: 'join_room'; roomCode: RoomCode; nickname: string }
+  | { type: 'create_room'; nickname: string; locale?: string; avatarId?: number | null; bgColor?: string | null }
+  | { type: 'join_room'; roomCode: RoomCode; nickname: string; locale?: string; avatarId?: number | null; bgColor?: string | null }
+  | { type: 'reconnect_room'; playerId: PlayerId; roomCode: RoomCode; locale?: string }
+  | { type: 'change_locale'; locale: string }
   | { type: 'start_game' }
   | { type: 'select_phrase'; phraseId: string }
   | { type: 'submit_meme'; memeId: string }
   | { type: 'select_winner'; oderId: string }
   | { type: 'next_round' }
-  | { type: 'reconnect'; playerId: PlayerId; roomCode: RoomCode };
+  | { type: 'finish_game' };
 
 // Server -> Client
 export type ServerMessage =
@@ -93,9 +102,10 @@ export type ServerMessage =
   | { type: 'player_reconnected'; playerId: PlayerId }
   | { type: 'phrase_selected'; phrase: Phrase }
   | { type: 'player_submitted'; playerId: PlayerId }
-  | { type: 'all_submitted'; submissions: Submission[] }
   | { type: 'winner_selected'; winnerId: PlayerId; oderId: string }
   | { type: 'new_round'; round: RoundState }
+  | { type: 'game_finished' }
+  | { type: 'locale_changed'; locale: string }
   | { type: 'error'; message: string };
 
 // ============ GAME SETTINGS ============

@@ -107,9 +107,20 @@
     "nextRound": "Next Round",
     "finishGame": "Finish Game"
   },
+  "avatarPicker": {
+    "avatarLabel": "Avatar",
+    "bgColorLabel": "Avatar Background"
+  },
   "memeCard": {
     "imageUnavailable": "Image unavailable",
     "memeAlt": "Meme"
+  },
+  "finished": {
+    "gameOver": "Game Over!",
+    "winner": "Winner",
+    "scoreboard": "Final Scoreboard",
+    "createNewGame": "Create New Game",
+    "backToHome": "Go to home page"
   },
   "notFound": {
     "error": "ERROR",
