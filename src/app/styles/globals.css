@@ -1,9 +1,9 @@
 @import 'tailwindcss';
 
-@import './theme.css';
-@import './utilities.css';
-@import './components.css';
-@import './game.css';
+@import '../styles/theme.css';
+@import '../styles/utilities.css';
+@import '../styles/components.css';
+@import '../styles/game.css';
 
 @layer base {
 
