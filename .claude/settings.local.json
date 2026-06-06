@@ -1,8 +1,13 @@
 {
-  "enableAllProjectMcpServers": true,
   "permissions": {
     "allow": [
-      "Read(//c/Users/serg9/Documents/GitHub/meme_academy-back_end/**)"
+      "Read(//c/Users/serg9/Documents/GitHub/meme_academy-back_end/**)",
+      "Bash(npm audit *)",
+      "Bash(Remove-Item -Recurse -Force node_modules/next/node_modules/postcss -ErrorAction SilentlyContinue)",
+      "Bash(npm install *)",
+      "PowerShell(node -e \"console.log\\(require\\('C:/Users/serg9/Documents/GitHub/meme_academy/node_modules/next/node_modules/postcss/package.json'\\).version\\)\")",
+      "Bash(npm *)"
     ]
-  }
+  },
+  "enableAllProjectMcpServers": true
 }
