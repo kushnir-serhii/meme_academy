@@ -33,7 +33,7 @@ function getCurrentLocale(): string {
 }
 
 export function useGameSocket() {
-  const store = useGameStore();
+  const connectionStatus = useGameStore((s) => s.connectionStatus);
   const isConnecting = useRef(false);
 
   const connect = useCallback(() => {
@@ -41,19 +41,20 @@ export function useGameSocket() {
 
     const s = getSocket();
     if (s.connected) {
-      store.setConnectionStatus('connected');
+      useGameStore.getState().setConnectionStatus('connected');
       return;
     }
 
     isConnecting.current = true;
-    store.setConnectionStatus('connecting');
+    useGameStore.getState().setConnectionStatus('connecting');
     s.connect();
-  }, [store]);
+  }, []);
+
   const disconnect = useCallback(() => {
     const s = getSocket();
     s.disconnect();
-    store.setConnectionStatus('disconnected');
-  }, [store]);
+    useGameStore.getState().setConnectionStatus('disconnected');
+  }, []);
 
   const finishGame = useCallback(() => {
     const s = getSocket();
@@ -64,33 +65,30 @@ export function useGameSocket() {
     (nickname: string, avatarId?: number | null, bgColor?: string | null) => {
       const s = getSocket();
       const locale = getCurrentLocale();
-      store.setLoading(true);
-      store.setMyAvatar(avatarId ?? null, bgColor ?? null);
+      useGameStore.getState().setLoading(true);
+      useGameStore.getState().setMyAvatar(avatarId ?? null, bgColor ?? null);
       s.emit('create_room', { nickname, locale, avatarId, bgColor });
     },
-    [store],
+    [],
   );
 
   const joinRoom = useCallback(
     (roomCode: string, nickname: string, avatarId?: number | null, bgColor?: string | null) => {
       const s = getSocket();
       const locale = getCurrentLocale();
-      store.setLoading(true);
-      store.setMyAvatar(avatarId ?? null, bgColor ?? null);
+      useGameStore.getState().setLoading(true);
+      useGameStore.getState().setMyAvatar(avatarId ?? null, bgColor ?? null);
       s.emit('join_room', { roomCode: roomCode.toUpperCase(), nickname, locale, avatarId, bgColor });
     },
-    [store],
+    [],
   );
 
-  const reconnectToRoom = useCallback(
-    (playerId: string, roomCode: string) => {
-      const s = getSocket();
-      const locale = getCurrentLocale();
-      store.setLoading(true);
-      s.emit('reconnect_room', { playerId, roomCode, locale });
-    },
-    [store],
-  );
+  const reconnectToRoom = useCallback((playerId: string, roomCode: string) => {
+    const s = getSocket();
+    const locale = getCurrentLocale();
+    useGameStore.getState().setLoading(true);
+    s.emit('reconnect_room', { playerId, roomCode, locale });
+  }, []);
 
   const startGame = useCallback(() => {
     const s = getSocket();
@@ -102,14 +100,11 @@ export function useGameSocket() {
     s.emit('select_phrase', { phraseId });
   }, []);
 
-  const submitMeme = useCallback(
-    (memeId: string) => {
-      const s = getSocket();
-      s.emit('submit_meme', { memeId });
-      store.setSubmitted(true);
-    },
-    [store],
-  );
+  const submitMeme = useCallback((memeId: string) => {
+    const s = getSocket();
+    s.emit('submit_meme', { memeId });
+    useGameStore.getState().setSubmitted(true);
+  }, []);
 
   const selectWinner = useCallback((oderId: string) => {
     const s = getSocket();
@@ -119,9 +114,9 @@ export function useGameSocket() {
   const nextRound = useCallback(() => {
     const s = getSocket();
     s.emit('next_round');
-    store.setSubmitted(false);
-    store.selectMeme(null);
-  }, [store]);
+    useGameStore.getState().setSubmitted(false);
+    useGameStore.getState().selectMeme(null);
+  }, []);
 
   const changeLocale = useCallback((locale: string) => {
     const s = getSocket();
@@ -133,11 +128,8 @@ export function useGameSocket() {
 
     const handleConnect = () => {
       isConnecting.current = false;
-      store.setConnectionStatus('connected');
-      // Reset error ===================================================================================
-      // store.setError(null);
+      useGameStore.getState().setConnectionStatus('connected');
 
-      // Try to reconnect to existing room
       const savedPlayerId = sessionStorage.getItem('playerId');
       const savedRoomCode = sessionStorage.getItem('roomCode');
       if (savedPlayerId && savedRoomCode) {
@@ -147,53 +139,51 @@ export function useGameSocket() {
 
     const handleDisconnect = () => {
       isConnecting.current = false;
-      store.setConnectionStatus('disconnected');
+      useGameStore.getState().setConnectionStatus('disconnected');
     };
 
     const handleConnectError = () => {
       isConnecting.current = false;
-      store.setConnectionStatus('disconnected');
-      store.setError('Failed to connect to server');
-      // Reset error =======================================================
-      setTimeout(() => store.setError(null), 5000);
+      useGameStore.getState().setConnectionStatus('disconnected');
+      useGameStore.getState().setError('Failed to connect to server');
+      setTimeout(() => useGameStore.getState().setError(null), 5000);
     };
 
     const handleRoomCreated = ({ roomCode, playerId }: { roomCode: string; playerId: string }) => {
-      store.setLoading(false);
-      store.setPlayerId(playerId);
-      store.setRoomCode(roomCode);
+      useGameStore.getState().setLoading(false);
+      useGameStore.getState().setPlayerId(playerId);
+      useGameStore.getState().setRoomCode(roomCode);
       sessionStorage.setItem('playerId', playerId);
       sessionStorage.setItem('roomCode', roomCode);
     };
 
     const handleRoomJoined = ({ playerId }: { playerId: string }) => {
-      store.setLoading(false);
-      store.setPlayerId(playerId);
+      useGameStore.getState().setLoading(false);
+      useGameStore.getState().setPlayerId(playerId);
       sessionStorage.setItem('playerId', playerId);
     };
 
     const handleRoomState = ({ state }: { state: GameState }) => {
-      store.setLoading(false);
-      store.syncGameState(state);
-      store.setRoomCode(state.roomCode);
+      useGameStore.getState().setLoading(false);
+      useGameStore.getState().syncGameState(state);
+      useGameStore.getState().setRoomCode(state.roomCode);
       sessionStorage.setItem('roomCode', state.roomCode);
     };
 
     const handleHandDealt = ({ hand }: { hand: any[] }) => {
-      store.setHand(hand);
-      store.setSubmitted(false);
-      store.selectMeme(null);
+      useGameStore.getState().setHand(hand);
+      useGameStore.getState().setSubmitted(false);
+      useGameStore.getState().selectMeme(null);
     };
 
     const handlePlayerSubmitted = ({ playerId }: { playerId: string }) => {
-      // Update local state to show player has submitted
-      const currentState = store.gameState;
+      const currentState = useGameStore.getState().gameState;
       if (currentState?.currentRound) {
         const updatedRound = {
           ...currentState.currentRound,
           submittedPlayerIds: [...currentState.currentRound.submittedPlayerIds, playerId],
         };
-        store.syncGameState({
+        useGameStore.getState().syncGameState({
           ...currentState,
           currentRound: updatedRound,
         });
@@ -201,21 +191,21 @@ export function useGameSocket() {
     };
 
     const handleGameFinished = () => {
-      const currentState = store.gameState;
-      store.setFinalGameState({
+      const currentState = useGameStore.getState().gameState;
+      useGameStore.getState().setFinalGameState({
         players: currentState?.players ?? [],
         judgeId: currentState?.currentRound?.judgeId ?? null,
       });
-      store.setShouldNavigateToFinished(true);
+      useGameStore.getState().setShouldNavigateToFinished(true);
       const s2 = getSocket();
       s2.disconnect();
-      store.setConnectionStatus('disconnected');
+      useGameStore.getState().setConnectionStatus('disconnected');
     };
 
     const handleError = ({ message }: { message: string }) => {
-      store.setLoading(false);
-      store.setError(message);
-      setTimeout(() => store.setError(null), 5000);
+      useGameStore.getState().setLoading(false);
+      useGameStore.getState().setError(message);
+      setTimeout(() => useGameStore.getState().setError(null), 5000);
     };
 
     s.on('connect', handleConnect);
@@ -226,12 +216,12 @@ export function useGameSocket() {
     s.on('room_state', handleRoomState);
     s.on('hand_dealt', handleHandDealt);
     s.on('player_submitted', handlePlayerSubmitted);
-    s.on('player_joined', () => {}); // Handled by room_state
-    s.on('player_left', () => {}); // Handled by room_state
-    s.on('player_reconnected', () => {}); // Handled by room_state
-    s.on('winner_selected', () => {}); // Handled by room_state
-    s.on('new_round', () => {}); // Handled by room_state
-    s.on('locale_changed', () => {}); // Acknowledged
+    s.on('player_joined', () => {});
+    s.on('player_left', () => {});
+    s.on('player_reconnected', () => {});
+    s.on('winner_selected', () => {});
+    s.on('new_round', () => {});
+    s.on('locale_changed', () => {});
     s.on('game_finished', handleGameFinished);
     s.on('error', handleError);
 
@@ -253,7 +243,7 @@ export function useGameSocket() {
       s.off('game_finished', handleGameFinished);
       s.off('error', handleError);
     };
-  }, [store, reconnectToRoom]);
+  }, [reconnectToRoom]);
 
   return {
     connect,
@@ -268,7 +258,7 @@ export function useGameSocket() {
     selectWinner,
     nextRound,
     changeLocale,
-    isConnected: store.connectionStatus === 'connected',
-    connectionStatus: store.connectionStatus,
+    isConnected: connectionStatus === 'connected',
+    connectionStatus,
   };
 }
