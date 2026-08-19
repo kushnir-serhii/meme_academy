@@ -22,7 +22,7 @@
 
   html,
   body {
-    @apply bg-bg-main relative z-1 min-h-screen font-[openSans] dark:bg-game-bg;
+    @apply bg-bg-main min-h-screen font-[openSans] dark:bg-game-bg;
   }
 
 }
