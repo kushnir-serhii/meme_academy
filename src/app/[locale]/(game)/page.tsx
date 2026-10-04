@@ -11,9 +11,9 @@ export default function GameHomePage() {
     <div className="screen">
       <div className="screen-content items-center justify-center gap-8 px-4">
         {/* Language Switcher */}
-        <div className="absolute top-4 right-4">
+        {/* <div className="absolute top-4 right-4">
           <LanguageSwitcher />
-        </div>
+        </div> */}
 
         {/* Logo */}
         <div className="text-center animate-fade-in">
